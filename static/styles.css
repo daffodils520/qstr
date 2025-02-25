@@ -1,0 +1,36 @@
+/* 设置页面的整体样式 */
+body {
+    font-family: Arial, sans-serif; /* 字体设置 */
+    margin: 20px;                  /* 页面边距 */
+    background-color: #f4f4f9;     /* 背景颜色 */
+}
+
+/* 设置标题的样式 */
+h1 {
+    color: #333;                   /* 字体颜色 */
+}
+
+/* 设置表单标签的样式 */
+label {
+    display: block;                /* 每个标签单独占一行 */
+    margin-top: 10px;              /* 上边距 */
+}
+
+/* 设置输入框和按钮的样式 */
+input, button {
+    margin-top: 5px;               /* 元素之间的间距 */
+}
+
+/* 设置按钮的样式 */
+button {
+    padding: 8px 12px;             /* 内边距，增大按钮区域 */
+    background-color: #007BFF;     /* 按钮背景颜色 */
+    color: #fff;                   /* 按钮字体颜色 */
+    border: none;                  /* 移除按钮边框 */
+    cursor: pointer;               /* 鼠标悬停时显示指针 */
+}
+
+/* 鼠标悬停在按钮上时的样式 */
+button:hover {
+    background-color: #0056b3;     /* 按钮背景颜色变深 */
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Genetic Algorithm Settings</title>
+</head>
+<body>
+    <h2>Genetic Algorithm (MLR): Settings</h2>
+    <label>Total number of iterations:</label>
+    <input type="number" id="iterations" value="100"><br>
+    <label>Equation Length:</label>
+    <input type="number" id="eq_length" value="4"><br>
+    <label>crossover Probability:</label>
+    <input type="number" id="crossover_prob" value="1"><br>
+    <label>Mutation Probability:</label>
+    <input type="number" id="mutation_prob" value="0.3"><br>
+    <label>Initial equations generated:</label>
+    <input type="number" id="initial_eq" value="100"><br>
+    <label>number of equationsselected in each generation:</label>
+    <input type="number" id="n_eq_selected_each_gene" value="30"><br>
+    <button onclick="saveSettings()">Save</button>
+
+    <script>
+    function saveSettings() {
+        const settings = {
+            iterations: document.getElementById("iterations").value,
+            eq_length: document.getElementById("eq_length").value,
+            crossover_prob: document.getElementById("crossover_prob").value,
+            mutation_prob: document.getElementById("mutation_prob").value,
+            initial_eq: document.getElementById("initial_eq").value,
+            n_eq_selected_each_gene: document.getElementById("n_eq_selected_each_gene").value
+        };
+
+        fetch("/save_settings", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(settings)
+        }).then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error("Error:", error));
+    }
+    </script>
+</body>
+</html>

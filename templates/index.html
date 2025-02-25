@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Small Dataset Modeler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            margin-top: 15px;
+            display: block;
+        }
+        input[type="text"], input[type="number"], input[type="file"] {
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .input-group input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003f8a;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Small Dataset Modeler</h1>
+    
+    <form id="modelForm" action="/run" method="POST" enctype="multipart/form-data">
+        <!-- 数据文件和输出文件夹选择 -->
+        <div class="section">
+            <!-- 数据文件选择 -->
+            <label for="dataset_file">Select small-dataset file:</label>
+            <div class="input-group">
+                <input type="file" name="file" id="dataset_file" accept=".csv">
+
+            </div>
+            <label for="external_dataset_file">Select external dataset file (optional):</label>
+            <div class="input-group">
+                <input type="file" name="external_file" id="external_dataset_file" accept=".csv">
+            </div>
+            <label for="output_folder">Select output folder:</label>
+            <div class="input-group">
+                <input type="text" name="output_folder" id="output_folder_path" placeholder="Please select the output folder!!" readonly>
+                <button type="button" id="browseButton">Browse</button>
+            </div>
+        </div>
+
+        <!-- 用户输入的测试集大小 -->
+        <div class="section">
+            <label for="combinationSizeInput">Enter combination size:</label>
+            <input type="text" id="combinationSizeInput" placeholder="Enter combination size">
+            <button type="button" id="submitButton">Submit</button>
+        </div>
+
+        <!-- 数据预处理 -->
+        <div class="section">
+            <label>Data PreTreatment:</label>
+            <div class="checkbox-group">
+                <input type="checkbox" id="data_pretreatment" name="data_pretreatment">
+                <label for="data_pretreatment" style="font-weight: normal;">Enable data preprocessing</label>
+            </div>
+            <label for="variance_cutoff">Variance cut-off:</label>
+            <input type="number" id="variance_cutoff" name="variance_cutoff" value="0.0001" step="0.0001">
+            <label for="inter_corr_cutoff">Inter-correlation (R²) cut-off:</label>
+            <input type="number" id="inter_corr_cutoff" name="inter_corr_cutoff" value="0.99" step="0.01">
+        </div>
+
+        <!-- 遗传算法设置 -->
+        <div class="section">
+            <label>Variable selection technique:</label>
+            <select id="variable_selection">
+                <option value="GA">Genetic Algorithm</option>
+            </select>
+            <button type="button" onclick="openGASettings()">Settings</button>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div style="text-align: center;">
+            <button type="submit">Run Model</button>
+        </div>
+    </form>
+
+    <script>
+        // 文件路径选择逻辑
+        document.getElementById("dataset_file").addEventListener("change", function() {
+            const file = this.files[0];
+            document.getElementById("dataset_path").value = file ? file.name : "";
+        });
+
+        // 添加文件夹选择逻辑
+        document.getElementById("browseButton").addEventListener("click", function () {
+            fetch("/select_folder", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.folderPath) {
+                        document.getElementById("output_folder_path").value = data.folderPath;
+                    } else if (data.message) {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+        });
+
+        // 提交 combination size
+        document.getElementById('submitButton').addEventListener('click', function(event) {
+            const combinationSize = document.getElementById('combinationSizeInput').value;
+            if (!combinationSize) {
+                alert('Please enter a valid combination size.');
+                return;
+            }
+
+            fetch('/submit_combination_size', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ combination_size: combinationSize })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => alert(`Combination size received: ${data.combination_size}`))
+            .catch(error => console.error('Error:', error));
+        });
+
+        function openGASettings() {
+            window.open("/settings", "_blank", "width=500,height=600");
+        }
+    </script>
+</body>
+</html>
